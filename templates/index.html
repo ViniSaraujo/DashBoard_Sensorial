@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Sensores CNPEM</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Estilos personalizados restantes, principalmente para a fonte e cor base */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        /* Ajuste para o canvas, garantindo que o fundo seja branco */
+        canvas {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased">
+    <div class="container max-w-5xl mx-auto bg-white p-8 md:p-10 rounded-lg shadow-xl my-8">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-center text-blue-800 mb-4 tracking-tight">
+            Dashboard de Monitoramento de Sensores
+        </h1>
+        <p class="text-lg text-center text-gray-600 mb-10 leading-relaxed">
+            Simulação de dados de temperatura, umidade e pressão coletados ao longo do tempo.
+            Este projeto demonstra a coleta, armazenamento e visualização de dados de sensores.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="chart-card bg-gray-50 border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col items-center justify-center">
+                <h2 class="text-2xl font-semibold text-blue-700 mb-4">Temperatura (°C)</h2>
+                <div class="w-full h-64">
+                    <canvas id="temperaturaChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card bg-gray-50 border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col items-center justify-center">
+                <h2 class="text-2xl font-semibold text-blue-700 mb-4">Umidade (%)</h2>
+                <div class="w-full h-64">
+                    <canvas id="umidadeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card bg-gray-50 border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col items-center justify-center">
+                <h2 class="text-2xl font-semibold text-blue-700 mb-4">Pressão (hPa)</h2>
+                <div class="w-full h-64">
+                    <canvas id="pressaoChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 p-6 bg-blue-50 text-blue-800 rounded-lg border border-blue-200 shadow-inner">
+            <h3 class="text-xl font-bold mb-3">Sobre o Projeto:</h3>
+            <p class="mb-2">Este projeto em Python simula a coleta de dados de sensores, armazena-os em um banco de dados SQLite e os exibe através de uma API Flask e um dashboard interativo. Demonstra conhecimentos em:</p>
+            <ul class="list-disc list-inside space-y-1">
+                <li>Desenvolvimento Backend com Python (Flask)</li>
+                <li>Gestão de Banco de Dados (SQLite)</li>
+                <li>Processamento e Simulação de Dados (Pandas, NumPy)</li>
+                <li>Criação de APIs REST</li>
+                <li>Desenvolvimento Frontend com HTML, JavaScript e Tailwind CSS</li>
+                <li>Visualização de Dados Interativa (Chart.js)</li>
+            </ul>
+            <p class="mt-3 text-sm italic">Desenvolvido como projeto de portfólio para demonstrar habilidades em TI.</p>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert("Erro ao carregar dados: " + data.error + "\nCertifique-se de que 'main.py' foi executado primeiro.");
+                        console.error("Erro da API:", data.error);
+                        return;
+                    }
+
+                    const timestamps = data.timestamps;
+
+                    // Gráfico de Temperatura
+                    new Chart(document.getElementById('temperaturaChart'), {
+                        type: 'line',
+                        data: {
+                            labels: timestamps,
+                            datasets: [{
+                                label: 'Temperatura (°C)',
+                                data: data.temperaturas,
+                                borderColor: 'rgb(255, 99, 132)', // Cor vermelha
+                                borderWidth: 2,
+                                fill: false,
+                                pointRadius: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false, // Permite que o gráfico se ajuste melhor ao container
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Timestamp',
+                                        color: '#4A5568' // gray-700
+                                    },
+                                    ticks: {
+                                        maxRotation: 45,
+                                        minRotation: 45,
+                                        color: '#718096' // gray-600
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'Temperatura (°C)',
+                                        color: '#4A5568'
+                                    },
+                                    ticks: {
+                                        color: '#718096'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        color: '#4A5568'
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0,0,0,0.7)',
+                                    titleColor: '#fff',
+                                    bodyColor: '#fff'
+                                }
+                            }
+                        }
+                    });
+
+                    // Gráfico de Umidade
+                    new Chart(document.getElementById('umidadeChart'), {
+                        type: 'line',
+                        data: {
+                            labels: timestamps,
+                            datasets: [{
+                                label: 'Umidade (%)',
+                                data: data.umidades,
+                                borderColor: 'rgb(54, 162, 235)', // Cor azul
+                                borderWidth: 2,
+                                fill: false,
+                                pointRadius: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Timestamp',
+                                        color: '#4A5568'
+                                    },
+                                    ticks: {
+                                        maxRotation: 45,
+                                        minRotation: 45,
+                                        color: '#718096'
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'Umidade (%)',
+                                        color: '#4A5568'
+                                    },
+                                    ticks: {
+                                        color: '#718096'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        color: '#4A5568'
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0,0,0,0.7)',
+                                    titleColor: '#fff',
+                                    bodyColor: '#fff'
+                                }
+                            }
+                        }
+                    });
+
+                    // Gráfico de Pressão
+                    new Chart(document.getElementById('pressaoChart'), {
+                        type: 'line',
+                        data: {
+                            labels: timestamps,
+                            datasets: [{
+                                label: 'Pressão (hPa)',
+                                data: data.pressoes,
+                                borderColor: 'rgb(75, 192, 192)', // Cor verde-água
+                                borderWidth: 2,
+                                fill: false,
+                                pointRadius: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Timestamp',
+                                        color: '#4A5568'
+                                    },
+                                    ticks: {
+                                        maxRotation: 45,
+                                        minRotation: 45,
+                                        color: '#718096'
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'Pressão (hPa)',
+                                        color: '#4A5568'
+                                    },
+                                    ticks: {
+                                        color: '#718096'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        color: '#4A5568'
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0,0,0,0.7)',
+                                    titleColor: '#fff',
+                                    bodyColor: '#fff'
+                                }
+                            }
+                        }
+                    });
+
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar dados da API:', error);
+                    alert("Erro de rede ou servidor ao buscar dados. Verifique se 'api.py' está rodando corretamente.");
+                });
+        });
+    </script>
+</body>
+</html>
