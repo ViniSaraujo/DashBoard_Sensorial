@@ -21,13 +21,13 @@ def gerar_dados_simulados(num_dias, leituras_por_hora):
     for i in range(num_dias * 24 * leituras_por_hora):
         timestamp = data_inicio + timedelta(minutes=i * intervalo_minutos)
 
-        # Simular temperatura (entre 20 e 30 graus, com ruído e variação diária)
+        # Simular temperatura (entre 20 e 30 graus, com ruído e variação diária, próximo ao que vivemos na realidade)
         temperatura = 25 + 5 * np.sin(i / (leituras_por_hora * 12)) + np.random.normal(0, 0.5)
 
         # Simular umidade (entre 40 e 70%, com ruído)
         umidade = 55 + 15 * np.cos(i / (leituras_por_hora * 8)) + np.random.normal(0, 1.5)
 
-        # Simular pressão (entre 1000 e 1020 hPa, com ruído e tendência suave)
+        # Simular pressão (entre 1000 e 1020 hPa - como a pressão do ar, com ruído e tendência suave)
         pressao = 1010 + 5 * np.sin(i / (leituras_por_hora * 24 * 2)) + np.random.normal(0, 0.2)
 
         dados.append({
@@ -92,4 +92,5 @@ if __name__ == "__main__":
         conn.close()
         print("Conexão com o banco de dados fechada.")
         print(f"\nO arquivo do banco de dados '{DB_NAME}' foi criado/atualizado em: {os.path.abspath(DB_NAME)}")
+
         print("Agora você pode rodar 'api.py' para iniciar o servidor web.")
