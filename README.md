@@ -47,7 +47,7 @@ O objetivo é simular um cenário real onde dados de múltiplos sensores (temper
 
 ## 🖼️ Screenshot do Dashboard
 
-
+![Screenshot do Dashboard](dashboard.png)
 ---
 
 ## 🛠️ Tecnologias Utilizadas
